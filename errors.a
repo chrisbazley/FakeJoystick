@@ -1,0 +1,53 @@
+;
+; FakeJoystick - joystick emulation module
+; Copyright (C) 2002  Chris Bazley
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 2 of the License, or
+; (at your option) any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program; if not, write to the Free Software
+; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+; Error blocks are assembled separately by ASM because the _kernel_oserror C structure wastes tons of memory
+AREA C$$data, DATA
+
+; My error block - &81A700
+; (SFX_Handler module uses error numbers up to &81A700-&81A710, ScreenGrabber module uses &81A720 and &81A721)
+
+EXPORT error_no_mem
+error_no_mem:
+  DCD &81A720 ; intentionally same number as ScreenGrabber error
+  DCSZ "Joystick module cannot claim memory"
+  ALIGN
+
+EXPORT bad_reason
+bad_reason:
+  DCD &81A730
+  DCSZ "Joystick_Read reason code not supported"
+  ALIGN
+
+EXPORT error_analogue
+error_analogue:
+  DCD &81A731
+  DCSZ "Operation not supported for switched joystick"
+  ALIGN
+
+EXPORT error_calib
+error_calib:
+  DCD &81A732
+  DCSZ "Joystick calibration incomplete"
+  ALIGN
+
+EXPORT FakeJSType_syntax
+FakeJSType_syntax:
+  DCD &dc ; same as system error number
+  DCSZ "Syntax: *FakeJSType [analogue|switched|damped]"
+  ALIGN

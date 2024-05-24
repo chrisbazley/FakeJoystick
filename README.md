@@ -197,6 +197,8 @@ Technical details
 
   The makefile is set up to compile APCS-32 code using Castle Technology's new release of the Acorn C/C++ RISC OS development suite. Since APCS-R code is incompatible with 32-bit modes (and hence new ARM CPUs), I consider it obsolescent.
 
+  Before compiling the module for RISC OS, move the files with .a, .cmhg, .c and .h suffixes into subdirectories named 'a', 'cmhg', 'c' and 'h' and remove those suffixes from their names. You probably also need to create an 'o' subdirectory for compiler output.
+
 -----------------------------------------------------------------------------
 To do
 =====

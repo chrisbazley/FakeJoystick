@@ -152,7 +152,7 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
         arg_ptrs[argcount] = writeable_args + i;  /* record start of argument */
         while (i < len && writeable_args[i] != ' ')
           i++;
-        writeable_args[i] = NULL;             /* zero terminate argument */
+        writeable_args[i] = '\0';             /* zero terminate argument */
         /*printf("arg_ptrs[%d]: %s\n",argcount,arg_ptrs[argcount]);*/
         argcount++;
       }

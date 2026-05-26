@@ -40,13 +40,14 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|AppleClang")
 endif()
 
 string(TOUPPER "${CMAKE_SYSTEM_NAME}" SYSTEM_NAME_UPPER)
+file(GLOB HEADER_FILES CONFIGURE_DEPENDS "*.h")
 
 if(SYSTEM_NAME_UPPER STREQUAL "RISCOS")
   # RISC OS: The only platform where it links and runs
-  add_executable(FakeJoystick FakeJoystick.c)
+  add_executable(FakeJoystick FakeJoystick.c ${HEADER_FILES})
 else()
   # Other platforms: Compile only (no linking) to catch errors
-  add_library(FakeJoystick FakeJoystick.c)
+  add_library(FakeJoystick FakeJoystick.c ${HEADER_FILES})
 endif()
 
 target_link_libraries(FakeJoystick PRIVATE

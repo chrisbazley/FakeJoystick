@@ -33,9 +33,4 @@ target_link_libraries(FakeJoystick PRIVATE
 
 target_compile_definitions(FakeJoystick PUBLIC
     $<$<CONFIG:Debug>:DEBUG_OUTPUT>
-    $<$<CONFIG:Release>:NDEBUG>
-)
-
-target_compile_options(FakeJoystick PUBLIC
-    $<$<CONFIG:Release>:-O3>
 )

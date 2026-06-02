@@ -464,35 +464,35 @@ _kernel_oserror *callevery_handler(_kernel_swi_regs *r, void *pw)
   if(mode == MODE_DAMPED) {
   
     /* Gradual decay function */
-    damp_x = damp_x - (damp_x>>4) - (damp_x>>5);
-    damp_y = damp_y - (damp_y>>4) - (damp_y>>5);
+    damp_x = damp_x - (damp_x / (1<<4)) - (damp_x / (1<<5));
+    damp_y = damp_y - (damp_y / (1<<4)) - (damp_y / (1<<5));
     
     /* move stick according to keys */
     if(left) {
       damp_x -= 15 * FIXED_POINT_ONE;
       if(damp_x >= 0)
-        damp_x -= damp_x>>2;
+        damp_x -= damp_x / (1<<2);
       if(damp_x < -127 * FIXED_POINT_ONE)
         damp_x = -127 * FIXED_POINT_ONE;
     }
     if(right) {
       damp_x += 15 * FIXED_POINT_ONE;
       if(damp_x < 0)
-        damp_x -= damp_x>>2;
+        damp_x -= damp_x / (1<<2);
       if(damp_x > 127 * FIXED_POINT_ONE)
         damp_x = 127 * FIXED_POINT_ONE;
     }
     if(up) {
       damp_y += 15 * FIXED_POINT_ONE;
       if(damp_y < 0)
-        damp_y -= damp_x>>2;
+        damp_y -= damp_x / (1<<2);
       if(damp_y > 127 * FIXED_POINT_ONE)
         damp_y = 127 * FIXED_POINT_ONE;
     }
     if(down) {
       damp_y -= 15 * FIXED_POINT_ONE;
       if(damp_y >= 0)
-        damp_y -= damp_y>>2;
+        damp_y -= damp_y / (1<<2);
       if(damp_y < -127 * FIXED_POINT_ONE)
         damp_y = -127 * FIXED_POINT_ONE;
     }

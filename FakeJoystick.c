@@ -61,6 +61,8 @@ static char mode; /* type of emulation */
 #define MODE_ANALOGUE 1
 #define MODE_DAMPED   2
 
+#define FIXED_POINT_ONE (1 << 10)
+
 static bool fake_calibrate_TR; /* waiting for Joystick_CalibrateBottomLeft? */
 static bool fake_calibrate_BL; /* waiting for Joystick_CalibrateTopRight? */
 
@@ -260,9 +262,9 @@ _kernel_oserror *FakeJoystick_swihandler(int swi_no, _kernel_swi_regs *r, void *
               if(stick_num == 0) {
                 /* first joystick is emulated */
                 if(mode == MODE_DAMPED)
-                  r->r[0] = ((damp_y>>10) & 0xff) | (((damp_x>>10) & 0xff) << 8) | (buttons << 16);
+                  r->r[0] = ((damp_y / FIXED_POINT_ONE) & 0xffu) | (((damp_x / FIXED_POINT_ONE) & 0xffu) << 8) | (buttons << 16);
                 else
-                  r->r[0] = (y_axis & 0xff) | ((x_axis & 0xff) << 8) | (buttons << 16);
+                  r->r[0] = (y_axis & 0xff) | ((x_axis & 0xffu) << 8) | (buttons << 16);
               }
               else {
                 /* other joysticks aren't */
@@ -467,32 +469,32 @@ _kernel_oserror *callevery_handler(_kernel_swi_regs *r, void *pw)
     
     /* move stick according to keys */
     if(left) {
-      damp_x -= 15<<10;
+      damp_x -= 15 * FIXED_POINT_ONE;
       if(damp_x >= 0)
         damp_x -= damp_x>>2;
-      if(damp_x < -127<<10)
-        damp_x = -127<<10;
+      if(damp_x < -127 * FIXED_POINT_ONE)
+        damp_x = -127 * FIXED_POINT_ONE;
     }
     if(right) {
-      damp_x += 15<<10;
+      damp_x += 15 * FIXED_POINT_ONE;
       if(damp_x < 0)
         damp_x -= damp_x>>2;
-      if(damp_x > 127<<10)
-        damp_x = 127<<10;
+      if(damp_x > 127 * FIXED_POINT_ONE)
+        damp_x = 127 * FIXED_POINT_ONE;
     }
     if(up) {
-      damp_y += 15<<10;
+      damp_y += 15 * FIXED_POINT_ONE;
       if(damp_y < 0)
         damp_y -= damp_x>>2;
-      if(damp_y > 127<<10)
-        damp_y = 127<<10;
+      if(damp_y > 127 * FIXED_POINT_ONE)
+        damp_y = 127 * FIXED_POINT_ONE;
     }
     if(down) {
-      damp_y -= 15<<10;
+      damp_y -= 15 * FIXED_POINT_ONE;
       if(damp_y >= 0)
         damp_y -= damp_y>>2;
-      if(damp_y < -127<<10)
-        damp_y = -127<<10;
+      if(damp_y < -127 * FIXED_POINT_ONE)
+        damp_y = -127 * FIXED_POINT_ONE;
     }
   } else {
     /* move stick according to keys */

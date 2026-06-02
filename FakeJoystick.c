@@ -485,7 +485,7 @@ _kernel_oserror *callevery_handler(_kernel_swi_regs *r, void *pw)
     if(up) {
       damp_y += 15 * FIXED_POINT_ONE;
       if(damp_y < 0)
-        damp_y -= damp_x / (1<<2);
+        damp_y -= damp_y / (1<<2);
       if(damp_y > 127 * FIXED_POINT_ONE)
         damp_y = 127 * FIXED_POINT_ONE;
     }

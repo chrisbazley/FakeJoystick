@@ -62,6 +62,9 @@ static char mode; /* type of emulation */
 #define MODE_DAMPED   2
 
 #define FIXED_POINT_ONE (1 << 10)
+#define REVERSE_DIRECTION_BOOST (1 << 2)
+#define DECAY_DIVISOR_A (1 << 4)
+#define DECAY_DIVISOR_B (1 << 5)
 
 static bool fake_calibrate_TR; /* waiting for Joystick_CalibrateBottomLeft? */
 static bool fake_calibrate_BL; /* waiting for Joystick_CalibrateTopRight? */
@@ -464,35 +467,35 @@ _kernel_oserror *callevery_handler(_kernel_swi_regs *r, void *pw)
   if(mode == MODE_DAMPED) {
   
     /* Gradual decay function */
-    damp_x = damp_x - (damp_x / (1<<4)) - (damp_x / (1<<5));
-    damp_y = damp_y - (damp_y / (1<<4)) - (damp_y / (1<<5));
+    damp_x = damp_x - (damp_x / DECAY_DIVISOR_A) - (damp_x / DECAY_DIVISOR_B);
+    damp_y = damp_y - (damp_y / DECAY_DIVISOR_A) - (damp_y / DECAY_DIVISOR_B);
     
     /* move stick according to keys */
     if(left) {
       damp_x -= 15 * FIXED_POINT_ONE;
       if(damp_x >= 0)
-        damp_x -= damp_x / (1<<2);
+        damp_x -= damp_x / REVERSE_DIRECTION_BOOST;
       if(damp_x < -127 * FIXED_POINT_ONE)
         damp_x = -127 * FIXED_POINT_ONE;
     }
     if(right) {
       damp_x += 15 * FIXED_POINT_ONE;
       if(damp_x < 0)
-        damp_x -= damp_x / (1<<2);
+        damp_x -= damp_x / REVERSE_DIRECTION_BOOST;
       if(damp_x > 127 * FIXED_POINT_ONE)
         damp_x = 127 * FIXED_POINT_ONE;
     }
     if(up) {
       damp_y += 15 * FIXED_POINT_ONE;
       if(damp_y < 0)
-        damp_y -= damp_y / (1<<2);
+        damp_y -= damp_y / REVERSE_DIRECTION_BOOST;
       if(damp_y > 127 * FIXED_POINT_ONE)
         damp_y = 127 * FIXED_POINT_ONE;
     }
     if(down) {
       damp_y -= 15 * FIXED_POINT_ONE;
       if(damp_y >= 0)
-        damp_y -= damp_y / (1<<2);
+        damp_y -= damp_y / REVERSE_DIRECTION_BOOST;
       if(damp_y < -127 * FIXED_POINT_ONE)
         damp_y = -127 * FIXED_POINT_ONE;
     }

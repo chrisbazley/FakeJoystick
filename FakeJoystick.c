@@ -24,6 +24,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <stdint.h>
 
 /* Acorn headers */
 #include "kernel.h"
@@ -103,8 +104,8 @@ _kernel_oserror *FakeJoystick_initialise(const char *cmd_tail, int podule_base, 
     _kernel_oserror *initerror;
     _kernel_swi_regs regs;
     regs.r[0] = VECTOR_EVENTV;
-    regs.r[1] = (int)&event_veneer;
-    regs.r[2] = (int)pw;
+    regs.r[1] = (intptr_t)&event_veneer;
+    regs.r[2] = (intptr_t)pw;
     initerror = _kernel_swi(OS_Claim, &regs, &regs);
     if(initerror != NULL) {
       _kernel_osbyte(OSB_DISABLEEVENT,EVENT_KEYTRANS,0); /* Refuse to live if we can't claim event vector */
@@ -170,8 +171,8 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
         if(mode != MODE_SWITCHED) {
           /* Remove OS_CallEvery routine */
           _kernel_swi_regs regs;
-          regs.r[0] = (int)callevery_veneer;
-          regs.r[1] = (int)pw;
+          regs.r[0] = (intptr_t)callevery_veneer;
+          regs.r[1] = (intptr_t)pw;
           cmd_error = _kernel_swi(OS_RemoveTickerEvent, &regs,&regs);
           if(cmd_error == NULL)
             mode = MODE_SWITCHED;
@@ -181,9 +182,9 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
           if(mode == MODE_SWITCHED) {
             /* Attach OS_CallEvery routine */
             _kernel_swi_regs regs;
-            regs.r[0] = (int)4; /* every 4 cs */
-            regs.r[1] = (int)callevery_veneer;
-            regs.r[2] = (int)pw;
+            regs.r[0] = 4; /* every 4 cs */
+            regs.r[1] = (intptr_t)callevery_veneer;
+            regs.r[2] = (intptr_t)pw;
             cmd_error = _kernel_swi(OS_CallEvery, &regs, &regs);
           }
           if(cmd_error == NULL)
@@ -193,9 +194,9 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
             if(mode == MODE_SWITCHED) {
               /* Attach OS_CallEvery routine */
               _kernel_swi_regs regs;
-              regs.r[0] = (int)4; /* every 4 cs */
-              regs.r[1] = (int)callevery_veneer;
-              regs.r[2] = (int)pw;
+              regs.r[0] = 4; /* every 4 cs */
+              regs.r[1] = (intptr_t)callevery_veneer;
+              regs.r[2] = (intptr_t)pw;
               cmd_error = _kernel_swi(OS_CallEvery, &regs, &regs);
             }
             if(cmd_error == NULL) {
@@ -537,16 +538,16 @@ _kernel_oserror *FakeJoystick_finalise(int fatal, int podule, void *pw)
 
   /* Remove event handler */
   regs.r[0] = VECTOR_EVENTV;
-  regs.r[1] = (int)&event_veneer;
-  regs.r[2] = (int)pw;
+  regs.r[1] = (intptr_t)&event_veneer;
+  regs.r[2] = (intptr_t)pw;
   err = _kernel_swi(OS_Release, &regs, &regs);
   if(err != NULL)
     return err; /* fail */
 
   if(mode != MODE_SWITCHED) {
     /* Remove OS_CallEvery routine */
-    regs.r[0] = (int)callevery_veneer;
-    regs.r[1] = (int)pw;
+    regs.r[0] = (intptr_t)callevery_veneer;
+    regs.r[1] = (intptr_t)pw;
     return _kernel_swi(OS_RemoveTickerEvent, &regs, &regs);
   }
   else

@@ -152,8 +152,8 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
       return &error_no_mem; /* fail */
     memcpy(writeable_args, arg_string, len + 1);
    
-    /* Split up writeable_args into arg_ptrs */
-    for (int i = 0; i < len && argcount < MAXARGS; i++) /* Scan command tail... */
+    /* Split up writeable_args into arg_ptrs, ignoring any excess arguments */
+    for (int i = 0; i < len && argcount < argc; i++) /* Scan command tail... */
     {
       while (writeable_args[i] == ' ')  /* strip leading spaces */
         i++;

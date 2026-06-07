@@ -127,11 +127,15 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
   #define MAXARGS 1
   char *writeable_args;
   char *arg_ptrs[MAXARGS];
-      
+  int argcount = 0;
+
   /* Don't think we can get spurious commands, but just in case.... */
   /*printf("cmd_no: %d\nargc: %d\n",cmd_no,argc);*/
   if(cmd_no != CMD_FakeJSType)
     return NULL; /* success */
+
+  if (argc > MAXARGS)
+    return NULL; /* should be impossible */
 
   {
     /* Make writable version of arg_string */
@@ -149,19 +153,16 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
     memcpy(writeable_args, arg_string, len + 1);
    
     /* Split up writeable_args into arg_ptrs */
+    for (int i = 0; i < len && argcount < MAXARGS; i++) /* Scan command tail... */
     {
-      int i, argcount = 0;
-      for (i = 0; i < len; i++) /* Scan command tail... */
-      {
-        while (writeable_args[i] == ' ')  /* strip leading spaces */
-          i++;
-        arg_ptrs[argcount] = writeable_args + i;  /* record start of argument */
-        while (i < len && writeable_args[i] != ' ')
-          i++;
-        writeable_args[i] = '\0';             /* zero terminate argument */
-        /*printf("arg_ptrs[%d]: %s\n",argcount,arg_ptrs[argcount]);*/
-        argcount++;
-      }
+      while (writeable_args[i] == ' ')  /* strip leading spaces */
+        i++;
+      arg_ptrs[argcount] = writeable_args + i;  /* record start of argument */
+      while (i < len && writeable_args[i] != ' ')
+        i++;
+      writeable_args[i] = '\0';             /* zero terminate argument */
+      /*printf("arg_ptrs[%d]: %s\n",argcount,arg_ptrs[argcount]);*/
+      argcount++;
     }
   }
 
@@ -169,7 +170,7 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
     /* FakeJSType [analogue|switched|damped] */
     _kernel_oserror *cmd_error = NULL;
 
-    if(argc > 0) {
+    if(argcount > 0) {
       /* set emulation type */
       lowercase(arg_ptrs[0]);
       if(strcmp(arg_ptrs[0], "switched") == 0) {

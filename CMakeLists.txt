@@ -33,6 +33,7 @@ if(USE_FORTIFY)
     )
 
     FetchContent_MakeAvailable(Fortify)
+    link_libraries(Fortify)
 endif()
 
 set(CMAKE_C_STANDARD 99)
@@ -79,13 +80,13 @@ if(SYSTEM_NAME_UPPER STREQUAL "RISCOS")
   add_executable(FakeJoystick FakeJoystick.c ${HEADER_FILES})
 else()
   # Other platforms: Compile only (no linking) to catch errors
-  add_library(FakeJoystick FakeJoystick.c ${HEADER_FILES})
+  add_library(FakeJoystick OBJECT FakeJoystick.c ${HEADER_FILES})
 endif()
 
 target_link_libraries(FakeJoystick PRIVATE
     OptionalAcornC
 )
 
-target_compile_definitions(FakeJoystick PUBLIC
+target_compile_definitions(FakeJoystick PRIVATE
     $<$<CONFIG:Debug>:DEBUG_OUTPUT>
 )

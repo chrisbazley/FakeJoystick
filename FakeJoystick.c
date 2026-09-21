@@ -106,12 +106,11 @@ _kernel_oserror *FakeJoystick_initialise(const char *cmd_tail, int podule_base, 
 
   /* Install event routine  */
   {
-    _kernel_oserror *initerror;
     _kernel_swi_regs regs;
     regs.r[0] = VECTOR_EVENTV;
     regs.r[1] = (intptr_t)&event_veneer;
     regs.r[2] = (intptr_t)pw;
-    initerror = _kernel_swi(OS_Claim, &regs, &regs);
+    _kernel_oserror *initerror = _kernel_swi(OS_Claim, &regs, &regs);
     if(initerror != NULL) {
       _kernel_osbyte(OSB_DISABLEEVENT,EVENT_KEYTRANS,0); /* Refuse to live if we can't claim event vector */
       return initerror; /* fail */
@@ -536,7 +535,6 @@ _kernel_oserror *callevery_handler(_kernel_swi_regs *r, void *pw)
 _kernel_oserror *FakeJoystick_finalise(int fatal, int podule, void *pw)
 {
   _kernel_swi_regs regs;
-  _kernel_oserror *err;
   
   /* Disable key transition event */
   if(_kernel_osbyte(OSB_DISABLEEVENT,EVENT_KEYTRANS,0)==_kernel_ERROR)
@@ -546,7 +544,7 @@ _kernel_oserror *FakeJoystick_finalise(int fatal, int podule, void *pw)
   regs.r[0] = VECTOR_EVENTV;
   regs.r[1] = (intptr_t)&event_veneer;
   regs.r[2] = (intptr_t)pw;
-  err = _kernel_swi(OS_Release, &regs, &regs);
+  _kernel_oserror *err = _kernel_swi(OS_Release, &regs, &regs);
   if(err != NULL)
     return err; /* fail */
 

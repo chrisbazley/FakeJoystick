@@ -109,7 +109,7 @@ _kernel_oserror *FakeJoystick_initialise(const char *cmd_tail, int podule_base, 
     _kernel_swi_regs regs = {
       .r = {
         VECTOR_EVENTV,
-        (intptr_t)&event_veneer,
+        (intptr_t)(void *)&event_veneer,
         (intptr_t)pw,
       }
     };
@@ -180,7 +180,7 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
           /* Remove OS_CallEvery routine */
           _kernel_swi_regs regs = {
             .r = {
-              (intptr_t)callevery_veneer,
+              (intptr_t)(void *)callevery_veneer,
               (intptr_t)pw,
             }
           };
@@ -195,7 +195,7 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
             _kernel_swi_regs regs = {
               .r = {
                 4, /* every 4 cs */
-                (intptr_t)callevery_veneer,
+                (intptr_t)(void *)callevery_veneer,
                 (intptr_t)pw,
               }
             };
@@ -210,7 +210,7 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
               _kernel_swi_regs regs = {
                 .r = {
                   4, /* every 4 cs */
-                  (intptr_t)callevery_veneer,
+                  (intptr_t)(void *)callevery_veneer,
                   (intptr_t)pw,
                 }
               };
@@ -554,7 +554,7 @@ _kernel_oserror *FakeJoystick_finalise(int fatal, int podule, void *pw)
   _kernel_swi_regs regs = {
     .r = {
       VECTOR_EVENTV,
-      (intptr_t)&event_veneer,
+      (intptr_t)(void *)&event_veneer,
       (intptr_t)pw,
     }
   };
@@ -566,7 +566,7 @@ _kernel_oserror *FakeJoystick_finalise(int fatal, int podule, void *pw)
     /* Remove OS_CallEvery routine */
     _kernel_swi_regs remove_regs = {
       .r = {
-        (intptr_t)callevery_veneer,
+        (intptr_t)(void *)callevery_veneer,
         (intptr_t)pw,
       }
     };

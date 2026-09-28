@@ -87,7 +87,7 @@ extern _kernel_oserror bad_reason, error_no_mem, error_analogue, error_calib, Fa
 
 /* ----------------------------------------------------------------------- */
 
-_kernel_oserror *FakeJoystick_initialise(const char *cmd_tail, int podule_base, void *pw)
+_Optional _kernel_oserror *FakeJoystick_initialise(const char *cmd_tail, int podule_base, void *pw)
 {
   (void)cmd_tail;
   (void)podule_base;
@@ -115,7 +115,7 @@ _kernel_oserror *FakeJoystick_initialise(const char *cmd_tail, int podule_base, 
         (intptr_t)pw,
       }
     };
-    _kernel_oserror *initerror = _kernel_swi(OS_Claim, &regs, &regs);
+    _Optional _kernel_oserror *initerror = _kernel_swi(OS_Claim, &regs, &regs);
     if(initerror != NULL) {
       _kernel_osbyte(OSB_DISABLEEVENT,EVENT_KEYTRANS,0); /* Refuse to live if we can't claim event vector */
       return initerror; /* fail */
@@ -126,7 +126,7 @@ _kernel_oserror *FakeJoystick_initialise(const char *cmd_tail, int podule_base, 
 
 /* ----------------------------------------------------------------------- */
 
-_kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void *pw)
+_Optional _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void *pw)
 {
   #define MAXARGS 1
   char *writeable_args;
@@ -172,7 +172,7 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
 
   {
     /* FakeJSType [analogue|switched|damped] */
-    _kernel_oserror *cmd_error = NULL;
+    _Optional _kernel_oserror *cmd_error = NULL;
 
     if(argcount > 0) {
       /* set emulation type */
@@ -260,7 +260,7 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
 
 /* ----------------------------------------------------------------------- */
 
-_kernel_oserror *FakeJoystick_swihandler(int swi_no, _kernel_swi_regs *r, void *private_word)
+_Optional _kernel_oserror *FakeJoystick_swihandler(int swi_no, _kernel_swi_regs *r, void *private_word)
 {
   (void)private_word;
   switch(swi_no) {
@@ -477,7 +477,7 @@ int event_handler(_kernel_swi_regs *r, void *pw)
 
 /* ----------------------------------------------------------------------- */
 
-_kernel_oserror *callevery_handler(_kernel_swi_regs *r, void *pw)
+_Optional _kernel_oserror *callevery_handler(_kernel_swi_regs *r, void *pw)
 {
   (void)r;
   (void)pw;
@@ -550,7 +550,7 @@ _kernel_oserror *callevery_handler(_kernel_swi_regs *r, void *pw)
 
 /* ----------------------------------------------------------------------- */
 
-_kernel_oserror *FakeJoystick_finalise(int fatal, int podule, void *pw)
+_Optional _kernel_oserror *FakeJoystick_finalise(int fatal, int podule, void *pw)
 {
   (void)fatal;
   (void)podule;
@@ -566,7 +566,7 @@ _kernel_oserror *FakeJoystick_finalise(int fatal, int podule, void *pw)
       (intptr_t)pw,
     }
   };
-  _kernel_oserror *err = _kernel_swi(OS_Release, &regs, &regs);
+  _Optional _kernel_oserror *err = _kernel_swi(OS_Release, &regs, &regs);
   if(err != NULL)
     return err; /* fail */
 

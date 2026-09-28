@@ -89,6 +89,8 @@ extern _kernel_oserror bad_reason, error_no_mem, error_analogue, error_calib, Fa
 
 _kernel_oserror *FakeJoystick_initialise(const char *cmd_tail, int podule_base, void *pw)
 {
+  (void)cmd_tail;
+  (void)podule_base;
   
   /* Reset imaginary joystick state */
   x_axis = 0;
@@ -109,7 +111,7 @@ _kernel_oserror *FakeJoystick_initialise(const char *cmd_tail, int podule_base, 
     _kernel_swi_regs regs = {
       .r = {
         VECTOR_EVENTV,
-        (intptr_t)(void *)&event_veneer,
+        (intptr_t)event_veneer,
         (intptr_t)pw,
       }
     };
@@ -157,7 +159,7 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
     /* Split up writeable_args into arg_ptrs, ignoring any excess arguments */
     for (int i = 0; i < len && argcount < argc; i++) /* Scan command tail... */
     {
-      while (writeable_args[i] == ' ')  /* strip leading spaces */
+      while (i < len && writeable_args[i] == ' ')  /* strip leading spaces */
         i++;
       arg_ptrs[argcount] = writeable_args + i;  /* record start of argument */
       while (i < len && writeable_args[i] != ' ')
@@ -180,7 +182,7 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
           /* Remove OS_CallEvery routine */
           _kernel_swi_regs regs = {
             .r = {
-              (intptr_t)(void *)callevery_veneer,
+              (intptr_t)callevery_veneer,
               (intptr_t)pw,
             }
           };
@@ -195,7 +197,7 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
             _kernel_swi_regs regs = {
               .r = {
                 4, /* every 4 cs */
-                (intptr_t)(void *)callevery_veneer,
+                (intptr_t)callevery_veneer,
                 (intptr_t)pw,
               }
             };
@@ -210,7 +212,7 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
               _kernel_swi_regs regs = {
                 .r = {
                   4, /* every 4 cs */
-                  (intptr_t)(void *)callevery_veneer,
+                  (intptr_t)callevery_veneer,
                   (intptr_t)pw,
                 }
               };
@@ -260,6 +262,7 @@ _kernel_oserror *cmd_handler(const char *arg_string, int argc, int cmd_no, void 
 
 _kernel_oserror *FakeJoystick_swihandler(int swi_no, _kernel_swi_regs *r, void *private_word)
 {
+  (void)private_word;
   switch(swi_no) {
   
     case 0: /* Joystick_Read */
@@ -352,6 +355,7 @@ _kernel_oserror *FakeJoystick_swihandler(int swi_no, _kernel_swi_regs *r, void *
 
 int event_handler(_kernel_swi_regs *r, void *pw)
 {
+  (void)pw;
   /* (no need to check event number, as CMHG veneer filters events for us) */
   
   switch(r->r[2]) {
@@ -475,6 +479,8 @@ int event_handler(_kernel_swi_regs *r, void *pw)
 
 _kernel_oserror *callevery_handler(_kernel_swi_regs *r, void *pw)
 {
+  (void)r;
+  (void)pw;
   /* Called every 4 cs (25 times a second) */
   if(mode == MODE_DAMPED) {
   
@@ -546,6 +552,8 @@ _kernel_oserror *callevery_handler(_kernel_swi_regs *r, void *pw)
 
 _kernel_oserror *FakeJoystick_finalise(int fatal, int podule, void *pw)
 {
+  (void)fatal;
+  (void)podule;
   /* Disable key transition event */
   if(_kernel_osbyte(OSB_DISABLEEVENT,EVENT_KEYTRANS,0)==_kernel_ERROR)
      return _kernel_last_oserror(); /* fail */
@@ -554,7 +562,7 @@ _kernel_oserror *FakeJoystick_finalise(int fatal, int podule, void *pw)
   _kernel_swi_regs regs = {
     .r = {
       VECTOR_EVENTV,
-      (intptr_t)(void *)&event_veneer,
+      (intptr_t)event_veneer,
       (intptr_t)pw,
     }
   };
@@ -566,7 +574,7 @@ _kernel_oserror *FakeJoystick_finalise(int fatal, int podule, void *pw)
     /* Remove OS_CallEvery routine */
     _kernel_swi_regs remove_regs = {
       .r = {
-        (intptr_t)(void *)callevery_veneer,
+        (intptr_t)callevery_veneer,
         (intptr_t)pw,
       }
     };
